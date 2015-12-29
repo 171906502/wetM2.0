@@ -5,7 +5,6 @@ namespace backend\modules\query\controllers;
 use Yii;
 use backend\controllers\BjuiController;
 use yii\data\Pagination;
-use yii\helpers\Json;
 use common\models\QueryField;
 use common\models\QueryTable;
 use yii\data\ActiveDataProvider;
@@ -32,16 +31,6 @@ class OrderController extends BjuiController
     }
     public function actionIndex()
     {
-        $rows = (new \yii\db\Query())
-            ->select(['cpgroupid', 'cpgroupname','id','name'])
-            ->from('demo.pre_common_admincp_group')
-            ->leftJoin('yii2advanced.menu','menu.id=pre_common_admincp_group.cpgroupid')
-            ->limit(10)
-            ->all();
-
-
-
-        $models=[];
 
         $menuId =31;
         $theadArray = QueryField::find()->where(['menuId'=>$menuId])->asArray()->with('queryTable')->all();
@@ -49,11 +38,11 @@ class OrderController extends BjuiController
         $masterTable =$this->getMasterTable($tables);
 
         $query= (new Query());
-        $query->from($masterTable['tabName']);
+        $query->from($masterTable['dbName'].'.'.$masterTable['tabName']);
         $query->select($masterTable['tabName'].'.'.'id');
         foreach($tables as $table){
             if ($table['isMain']!='1'){
-                $query->leftJoin($table['tabName'],$table['condition']);
+                $query->leftJoin($table['dbName'].'.'.$table['tabName'],$table['condition']);
             }
         }
         foreach ($theadArray as $thead){
@@ -63,6 +52,12 @@ class OrderController extends BjuiController
                 $addSelect = $thead['queryTable']['tabName'];
             }
             $addSelect = $addSelect.'.'.$thead['fieldName'];
+            if($thead['makeTbName']!=1){
+                $addSelect=$thead['fieldName'];
+            }
+            if($thead['reName']){
+                $addSelect = $addSelect.' '.'as'.' '.$thead['reName'];
+            }
             $query->addSelect($addSelect);
 
         }
@@ -72,10 +67,17 @@ class OrderController extends BjuiController
             'totalCount' => $query->count(),
             'defaultPageSize' => 20
         ]);
+        $sort = [
+                'defaultOrder' => [
+                    'id' => SORT_DESC
+                ]
+            ];
 
         $provider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => $pages
+            'pagination' => $pages,
+            'sort'=>$sort
+
         ]);
         $models = $provider->getModels();
         return $this->render('index', [

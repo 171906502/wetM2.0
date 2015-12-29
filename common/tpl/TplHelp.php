@@ -52,7 +52,7 @@ class TplHelp extends \yii\gii\Generator {
             $fileContents = file_get_contents($controllerFile);
             if(strstr($fileContents,'action'.ucwords($action))===false){
                 $oldContent =  substr($fileContents,0,strripos($fileContents,"//class end"));
-                $newAction = $this->render('action.php',['actionName'=>'action'.ucwords($action)]);
+                $newAction = $this->render('action.php',['actionName'=>'action'.ucwords($action),'menuId'=>$menuId]);
                 $newController = $oldContent."\r\n".$newAction;
                 $openFile = fopen($controllerFile,"w");
                 fwrite($openFile,$newController);
@@ -63,7 +63,7 @@ class TplHelp extends \yii\gii\Generator {
         }else{
             //新的controllor
             $actionName='action'.ucwords($action);
-            $newController = $this->render('controller.php',['controllerName'=>ucwords($controller),'actionName'=>$actionName]);
+            $newController = $this->render('controller.php',['controllerName'=>ucwords($controller),'actionName'=>$actionName,'menuId'=>$menuId]);
             $openFileController = fopen($controllerFile,"w");
             fwrite($openFileController,$newController);
 
@@ -78,7 +78,7 @@ class TplHelp extends \yii\gii\Generator {
         if(!file_exists($viewsDir)){
             mkdir($viewsDir);
         }
-        $newView = $this->render('view.php',['searchUrl'=>'"'.$action.'"','menuId'=>$menuId]);
+        $newView = $this->render('view.php',['searchUrl'=>'"'.$action.'"']);
         $openFileView = fopen($viewFile,"w");
         fwrite($openFileView,$newView);
 

@@ -11,6 +11,10 @@
     <th align="center" width="50" nowrap>序号</th>
     <?php
         foreach($theadArray as $thead ){?>
-        <th align="center" data-order-field= '<?php echo $thead['fieldName']?>' > <?php echo $thead['fieldText']?> </th>
+        <th align="center" data-order-field= '<?php  if(isset($thead['reName'])){
+            echo $thead['reName'];
+        } else{
+            echo $thead['fieldName'];
+        }?>' > <?php echo $thead['fieldText']?> </th>
         <?php }?>
 </tr>

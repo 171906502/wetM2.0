@@ -1,6 +1,3 @@
 <?php
-
-echo "<?php\n";
-?>
-$searchUrl =<?php echo $searchUrl?>;
+$searchUrl ="index";
 include dirname(dirname(__FILE__))."/TplSearch.php";

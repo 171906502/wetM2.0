@@ -50,7 +50,6 @@ use yii\helpers\Url;
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="50">50</option>
-                <option value="100">100</option>
             </select>
         </div>
         <span>&nbsp;条，共 <?= $pages->totalCount ?> 条</span>

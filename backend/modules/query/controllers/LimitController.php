@@ -1,8 +1,5 @@
 <?php
 
-echo "<?php\n";
-?>
-
 namespace backend\modules\query\controllers;
 
 use Yii;
@@ -12,8 +9,9 @@ use common\models\QueryField;
 use common\models\QueryTable;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
+use yii\base\NotSupportedException;
 
-class <?php echo $controllerName.'Controller' ?> extends BjuiController
+class LimitController extends BjuiController
 {
     public function getMasterTable($tables)
     {
@@ -31,9 +29,9 @@ class <?php echo $controllerName.'Controller' ?> extends BjuiController
 
     }
 
-    public function <?php echo $actionName ?>()
+    public function actionIndex()
     {
-        $menuId =<?php echo $menuId?>;
+        $menuId =32;
         $theadArray = QueryField::find()->where(['menuId' => $menuId])->asArray()->with('queryTable')->all();
         $tables = QueryTable::find()->where(['menuId' => $menuId])->asArray()->all();
         $masterTable = $this->getMasterTable($tables);

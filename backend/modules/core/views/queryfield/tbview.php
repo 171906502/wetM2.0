@@ -1,7 +1,6 @@
 <?php
 use yii\helpers\Url;
 ?>
-
 <script type="text/javascript">
     $('#test-datagrid-json').datagrid({
         gridTitle : '',
@@ -9,49 +8,20 @@ use yii\helpers\Url;
         toolbarItem: 'all',
         addLocation:'last',
         local: 'remote',
-        dataUrl: '<?= Url::toRoute(['loadfield'])?>&menuId=<?php echo $menuId?>',
+        dataUrl: '<?= Url::toRoute(['loadtable'])?>&menuId=<?php echo $menuId?>',
         dataType: 'json',
         filterThead: false,
         columns: [
-
             {
-                name: 'fieldText',
-                label: '显示名称',
+                name: 'dbName',
+                label: '数据库',
                 type: 'string',
                 align: 'center',
-                width: 150
+                width: 100
             },
             {
-                name: 'dataType',
-                label: '数据类型',
-                type: 'select',
-                items: [{'1':'int'}, {'2':'number'}, {'3':'string'}, {'4':'date'}],
-                align: 'center',
-                width: 100,
-                val:'2'
-
-            },
-            {
-                name: 'isQuery',
-                label: '查询条件',
-                type: 'select',
-                items: [{'2':'否'},{'1':'是'}],
-                align: 'center',
-                width: 100,
-                val:'2'
-
-            },
-            {
-                name: 'tabId',
-                label: '表明称',
-                type: 'select',
-                align: 'center',
-                items:[<?php echo json_encode($items)?>],
-                width: 150
-            },
-            {
-                name: 'fieldName',
-                label: '字段名称',
+                name: 'tabName',
+                label: '表名称',
                 type: 'string',
                 align: 'center',
                 width: 100
@@ -64,12 +34,21 @@ use yii\helpers\Url;
                 width: 100
             },
             {
-                name: 'makeTbName',
-                label: '生成表名',
+                name: 'isMain',
+                label: '主表/副表',
                 type: 'select',
-                items: [{'1':'是'},{'2':'否'}],
+                items: [{'2':'副表'}, {'1':'主表'}],
                 align: 'center',
-                width: 100
+                width: 100,
+                val:'2'
+
+            },
+            {
+                name: 'condition',
+                label: '连接条件',
+                type: 'string',
+                align: 'center',
+                width: 300
             },
             {
                 name: 'menuId',
@@ -78,11 +57,19 @@ use yii\helpers\Url;
                 align: 'center',
                 width: 100,
                 hide:true
+            },
+            {
+                name: 'id',
+                label: '',
+                type: 'int',
+                align: 'center',
+                width: 100,
+                hide:true
             }
         ],
-        editUrl: '<?= Url::toRoute(['create'])?>&menuId=<?php echo $menuId?>',
+        editUrl: '<?= Url::toRoute(['tabcreate'])?>&menuId=<?php echo $menuId?>',
         saveAll:true,
-        delUrl : '<?= Url::toRoute(['deletefield'])?>&menuId=<?php echo $menuId?>',
+        delUrl : '<?= Url::toRoute(['tabdelete'])?>&menuId=<?php echo $menuId?>',
         contextMenuB: true,
         paging: false,
         editMode: 'inline',

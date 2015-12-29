@@ -36,11 +36,13 @@ class MenuController extends BjuiController
     {
         $model = new Menu();
         $model->attributes = Yii::$app->request->post();
-        //TODO 是否必须成功创建模板文件，暂时只执行创建逻辑，不判断结果
-        $tplHelp = new TplHelp();
-        $tplHelp->create($model->url,$model->id);
+
 
         if ($model->save()) {
+            //TODO 是否必须成功创建模板文件，暂时只执行创建逻辑，不判断结果
+            $tplHelp = new TplHelp();
+            $tplHelp->create($model->url,$model->id);
+
             $this->data['id'] = yii::$app->db->getLastInsertID();
             return $this->ok('增加成功');
         } else {

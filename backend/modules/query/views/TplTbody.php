@@ -13,11 +13,13 @@
         <td align="center"  class="datagrid-linenumber-td"><div><?php echo $rowNumber?></div></td>
         <?php
             foreach($theadArray as $thead){ ?>
-               <?php if(isset($model[$thead['fieldName']])){?>
-                    <td><? echo $model[$thead['fieldName']]?></td>
-                     <?php }else{
-                    echo "<td></td>";
-                }
+               <?php if(isset($model[$thead['reName']])){?>
+                    <td><? echo $model[$thead['reName']]?></td>
+                     <?php }elseif (isset($model[$thead['fieldName']])){?>
+                            <td><? echo $model[$thead['fieldName']]?></td>
+                        <?php }else{
+                            echo "<td></td>";
+                        }
                 ?>
             <?php
                 }?>
