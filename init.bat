@@ -1,5 +1,4 @@
 @echo off
-
 rem -------------------------------------------------------------
 rem  Yii command line init script for Windows.
 rem

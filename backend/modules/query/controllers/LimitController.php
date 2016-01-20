@@ -9,7 +9,7 @@ use common\models\QueryField;
 use common\models\QueryTable;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
-use yii\base\NotSupportedException;
+use common\data\WetSort;
 
 class LimitController extends BjuiController
 {
@@ -31,7 +31,8 @@ class LimitController extends BjuiController
 
     public function actionIndex()
     {
-        $menuId =32;
+        $request = Yii::$app->request;
+        $menuId =31;
         $theadArray = QueryField::find()->where(['menuId' => $menuId])->asArray()->with('queryTable')->all();
         $tables = QueryTable::find()->where(['menuId' => $menuId])->asArray()->all();
         $masterTable = $this->getMasterTable($tables);
@@ -57,32 +58,52 @@ class LimitController extends BjuiController
                 $query->leftJoin($table['tabName'], $table['condition']);
             }
         }
-        foreach ($theadArray as $thead) {
-            if ($thead['queryTable']['reName']) {
+        //排序字段
+        $attributes=[];
+        //查询条件
+        $where=[];
+        foreach ($theadArray as $thead){
+            if ($thead['queryTable']['reName']){
                 $addSelect = $thead['queryTable']['reName'];
-            } else {
+            }else{
                 $addSelect = $thead['queryTable']['tabName'];
             }
-            $addSelect = $addSelect . '.' . $thead['fieldName'];
-            if ($thead['makeTbName'] != 1) {
-                $addSelect = $thead['fieldName'];
+            $addSelect = $addSelect.'.'.$thead['fieldName'];
+            if($thead['makeTbName']!=1){
+                $addSelect=$thead['fieldName'];
             }
-            if ($thead['reName']) {
-                $addSelect = $addSelect . ' ' . 'as' . ' ' . $thead['reName'];
+            if($thead['reName']){
+                //组装排序字段
+                array_push($attributes,$thead['reName']);
+                //查询字段
+                $addSelect = $addSelect.' '.'as'.' '.$thead['reName'];
+            }else{
+                array_push($attributes,$thead['fieldName']);
             }
             $query->addSelect($addSelect);
 
+            //组装查询条件
+            if($thead['isQuery']=='1'&&$thead['reName']){
+                $where[$thead['reName']]=$request->get($thead['reName']);
+            }elseif($thead['isQuery']=='1'){
+                $where[$thead['fieldName']]=$request->get($thead['fieldName']);
+            }
+
         }
+        $query->where($where);
         $pages = new Pagination([
             'pageParam' => 'pageCurrent',
             'pageSizeParam' => 'pageSize',
-            'totalCount' => $query->count(),
             'defaultPageSize' => 20
         ]);
-
+        $sort = new WetSort([
+            'attributes' => $attributes,
+        ]);
         $provider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => $pages
+            'pagination' => $pages,
+            'sort' =>$sort
+
         ]);
         $models = $provider->getModels();
         return $this->render('index', [

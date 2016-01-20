@@ -12,6 +12,7 @@ use common\models\QueryField;
 use common\models\QueryTable;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
+use common\data\WetSort;
 
 class <?php echo $controllerName.'Controller' ?> extends BjuiController
 {
@@ -59,18 +60,22 @@ class <?php echo $controllerName.'Controller' ?> extends BjuiController
                 $query->leftJoin($table['tabName'], $table['condition']);
             }
         }
-        foreach ($theadArray as $thead) {
-            if ($thead['queryTable']['reName']) {
+        $attributes=[];
+        foreach ($theadArray as $thead){
+            if ($thead['queryTable']['reName']){
                 $addSelect = $thead['queryTable']['reName'];
-            } else {
+            }else{
                 $addSelect = $thead['queryTable']['tabName'];
             }
-            $addSelect = $addSelect . '.' . $thead['fieldName'];
-            if ($thead['makeTbName'] != 1) {
-                $addSelect = $thead['fieldName'];
+            $addSelect = $addSelect.'.'.$thead['fieldName'];
+            if($thead['makeTbName']!=1){
+                $addSelect=$thead['fieldName'];
             }
-            if ($thead['reName']) {
-                $addSelect = $addSelect . ' ' . 'as' . ' ' . $thead['reName'];
+            if($thead['reName']){
+                array_push($attributes,$thead['reName']);
+                $addSelect = $addSelect.' '.'as'.' '.$thead['reName'];
+            }else{
+                array_push($attributes,$thead['fieldName']);
             }
             $query->addSelect($addSelect);
 
@@ -78,13 +83,16 @@ class <?php echo $controllerName.'Controller' ?> extends BjuiController
         $pages = new Pagination([
             'pageParam' => 'pageCurrent',
             'pageSizeParam' => 'pageSize',
-            'totalCount' => $query->count(),
             'defaultPageSize' => 20
         ]);
-
+        $sort = new WetSort([
+            'attributes' => $attributes,
+        ]);
         $provider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => $pages
+            'pagination' => $pages,
+            'sort' =>$sort
+
         ]);
         $models = $provider->getModels();
         return $this->render('index', [

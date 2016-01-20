@@ -10,6 +10,7 @@ use common\models\QueryTable;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use yii\base\NotSupportedException;
+use common\data\WetSort;
 
 class OrderController extends BjuiController
 {
@@ -31,7 +32,7 @@ class OrderController extends BjuiController
     }
     public function actionIndex()
     {
-
+        $request = Yii::$app->request;
         $menuId =31;
         $theadArray = QueryField::find()->where(['menuId'=>$menuId])->asArray()->with('queryTable')->all();
         $tables = QueryTable::find()->where(['menuId'=>$menuId])->asArray()->all();
@@ -45,6 +46,9 @@ class OrderController extends BjuiController
                 $query->leftJoin($table['dbName'].'.'.$table['tabName'],$table['condition']);
             }
         }
+        //排序字段
+        $attributes=[];
+
         foreach ($theadArray as $thead){
             if ($thead['queryTable']['reName']){
                 $addSelect = $thead['queryTable']['reName'];
@@ -56,27 +60,36 @@ class OrderController extends BjuiController
                 $addSelect=$thead['fieldName'];
             }
             if($thead['reName']){
+                //组装排序字段
+                array_push($attributes,$thead['reName']);
+                //查询字段
                 $addSelect = $addSelect.' '.'as'.' '.$thead['reName'];
+            }else{
+                array_push($attributes,$thead['fieldName']);
             }
             $query->addSelect($addSelect);
 
+            //组装查询条件
+            if($thead['isQuery']=='1'&&$thead['reName']&&$request->get($thead['reName'])){
+                $query->andWhere(['like', $thead['reName'], $request->get($thead['reName'])]);
+            }elseif($thead['isQuery']=='1'&&$request->get($thead['fieldName'])){
+                $query->andWhere(['like', $thead['fieldName'], $request->get($thead['fieldName'])]);
+            }
+
         }
+        $sort = new WetSort([
+            'attributes' => $attributes,
+        ]);
         $pages = new Pagination([
             'pageParam' => 'pageCurrent',
             'pageSizeParam' => 'pageSize',
-            'totalCount' => $query->count(),
             'defaultPageSize' => 20
         ]);
-        $sort = [
-                'defaultOrder' => [
-                    'id' => SORT_DESC
-                ]
-            ];
 
         $provider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => $pages,
-            'sort'=>$sort
+            'sort' =>$sort
 
         ]);
         $models = $provider->getModels();

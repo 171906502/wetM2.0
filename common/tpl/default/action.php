@@ -27,6 +27,7 @@
                       $query->leftJoin($table['tabName'],$table['condition']);
                   }
               }
+              $attributes=[];
               foreach ($theadArray as $thead){
                   if ($thead['queryTable']['reName']){
                       $addSelect = $thead['queryTable']['reName'];
@@ -38,7 +39,10 @@
                       $addSelect=$thead['fieldName'];
                   }
                   if($thead['reName']){
+                      array_push($attributes,$thead['reName']);
                       $addSelect = $addSelect.' '.'as'.' '.$thead['reName'];
+                  }else{
+                      array_push($attributes,$thead['fieldName']);
                   }
                   $query->addSelect($addSelect);
 
@@ -46,13 +50,16 @@
               $pages = new Pagination([
                   'pageParam' => 'pageCurrent',
                   'pageSizeParam' => 'pageSize',
-                  'totalCount' => $query->count(),
                   'defaultPageSize' => 20
               ]);
-
+              $sort = new WetSort([
+                  'attributes' => $attributes,
+              ]);
               $provider = new ActiveDataProvider([
                   'query' => $query,
-                  'pagination' => $pages
+                  'pagination' => $pages,
+                  'sort' =>$sort
+
               ]);
               $models = $provider->getModels();
               return $this->render('index', [
